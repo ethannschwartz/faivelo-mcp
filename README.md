@@ -1,5 +1,7 @@
 # Faivelo Email MCP server
 
+[![smithery badge](https://smithery.ai/badge/faivelo/mail)](https://smithery.ai/servers/faivelo/mail)
+
 Give Claude, ChatGPT, Cursor or any MCP client a real email address on your own
 domain. Read and send mail, search every mailbox, manage aliases and DNS: all
 from the assistant you already use.
