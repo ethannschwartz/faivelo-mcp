@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.faivelo/mail",
+  "title": "Faivelo Email",
+  "description": "Business email on your own domain: mailboxes, send and read mail, aliases, DNS setup, and campaigns.",
+  "version": "1.0.0",
+  "websiteUrl": "https://faivelo.com/ai-agents",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://faivelo.com/api/mcp"
+    }
+  ]
+}
