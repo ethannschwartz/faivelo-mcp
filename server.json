@@ -5,6 +5,10 @@
   "description": "Business email on your own domain: mailboxes, send and read mail, aliases, DNS setup, and campaigns.",
   "version": "1.0.0",
   "websiteUrl": "https://faivelo.com/ai-agents",
+  "repository": {
+    "url": "https://github.com/ethannschwartz/faivelo-mcp",
+    "source": "github"
+  },
   "remotes": [
     {
       "type": "streamable-http",
