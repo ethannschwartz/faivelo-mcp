@@ -1,0 +1,11 @@
+{
+  "name": "faivelo",
+  "version": "1.0.0",
+  "description": "Email on your own domain: the Faivelo MCP server plus a skill for setting up mailboxes, sending transactional email and receiving replies as webhooks.",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "faivelo": {
+      "httpUrl": "https://faivelo.com/api/mcp"
+    }
+  }
+}

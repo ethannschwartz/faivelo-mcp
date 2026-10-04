@@ -1,0 +1,19 @@
+{
+  "name": "faivelo",
+  "displayName": "Faivelo Email",
+  "version": "1.0.0",
+  "description": "Email on your own domain for Claude Code: the Faivelo MCP server (read, search, send and organise mail, mailboxes, aliases, DNS) and a skill for setting up a domain, sending from an app and receiving replies as webhooks.",
+  "author": {
+    "name": "Faivelo",
+    "email": "support@faivelo.com",
+    "url": "https://faivelo.com"
+  },
+  "homepage": "https://faivelo.com/docs/developers/coding-agents/",
+  "repository": "https://github.com/ethannschwartz/faivelo-mcp",
+  "license": "MIT",
+  "keywords": ["email", "mcp", "smtp", "imap", "transactional-email", "webhooks", "custom-domain", "dns", "inbox"],
+  "documentationUrl": "https://faivelo.com/docs/developers/connect-claude/",
+  "supportUrl": "https://faivelo.com/support",
+  "privacyPolicyUrl": "https://faivelo.com/privacy",
+  "termsOfServiceUrl": "https://faivelo.com/terms"
+}

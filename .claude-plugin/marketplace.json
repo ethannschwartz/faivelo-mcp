@@ -1,0 +1,16 @@
+{
+  "name": "faivelo",
+  "description": "Faivelo email for coding agents: the hosted MCP server plus a skill for setting up email on a domain, sending from an app and receiving replies as webhooks.",
+  "owner": {
+    "name": "Faivelo",
+    "email": "support@faivelo.com",
+    "url": "https://faivelo.com"
+  },
+  "plugins": [
+    {
+      "name": "faivelo",
+      "source": "./",
+      "description": "Email on your own domain: connect the Faivelo MCP server (read, send and manage mail) and teach Claude to set up mailboxes, send transactional email and handle inbound webhooks."
+    }
+  ]
+}
