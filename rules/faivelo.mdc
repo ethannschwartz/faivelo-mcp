@@ -1,0 +1,350 @@
+---
+description: Set up and use email on a custom domain with Faivelo. Use when the user needs mailboxes on their own domain (hello@, support@, team inboxes), wants their app to send transactional email (receipts, password resets, notifications) from their domain, needs to receive replies or inbound mail as webhooks, or wants an AI agent to read and send mail through an inbox (MCP or REST). Covers the `npx faivelo init` CLI, the `faivelo` SDKs for Node and Python, the REST API, signed webhooks and the hosted MCP server.
+alwaysApply: false
+---
+
+# Faivelo email
+
+Faivelo is email hosting for a custom domain: mailboxes, a send API, inbound
+webhooks and a hosted MCP server, on one account. Pick the path that matches
+what the user asked for. You can combine them.
+
+| The user wants | Do this |
+| --- | --- |
+| Mailboxes on their domain (hello@, support@) | Run `npx faivelo init <domain>` |
+| Their app to send email from their domain | API key + SDK or `POST /api/v1/emails` |
+| To get replies / inbound mail into their app | Webhook on `message.received` |
+| You (or another agent) to read and send their mail | Connect the MCP server |
+
+Costs: forwarding-only is free; mailboxes, the send API and SMTP/IMAP need a
+paid plan (from $6/month, flat, unlimited mailboxes); MCP is included from
+Growth; webhooks from Pro. New accounts get a free trial without a card.
+Plans: https://faivelo.com/docs/billing/plans/?via=cursor. Tell the user before anything
+that needs a plan or a payment. Never pick a plan or enter payment details
+for them.
+
+## 1. Set up email on a domain
+
+```bash
+npx faivelo init example.com
+```
+
+Interactive. It opens a browser for the user to sign in or create an account
+and approve a pairing code, checks the domain, writes the DNS records
+(one click on Cloudflare, Vercel, Netlify, DigitalOcean and Google Cloud DNS;
+API key for GoDaddy, Namecheap, Route 53, Porkbun and others; copy-ready
+values otherwise), waits for DNS, and creates the first mailbox. It prints the
+mailbox password and IMAP/SMTP settings once and can write `SMTP_*` and
+`IMAP_*` into `.env`.
+
+- The user has to approve the browser step. Hand it to them; do not try to
+  automate their sign-in.
+- Over SSH or in a container: `npx faivelo init example.com --no-open` prints
+  the link instead.
+- Re-running is safe; it resumes. `npx faivelo status example.com` checks DNS
+  live. `npx faivelo dns example.com --zone` prints a BIND zone file.
+- When setup is done and the Faivelo MCP server is connected, call its
+  `get_setup_summary` tool and give the user the summary it returns: what
+  was set up, what is still pending, and where to manage it.
+- If the domain already receives mail somewhere else, the CLI says so before
+  changing anything. Do not move a domain's MX without the user agreeing.
+
+## 2. Send email from an app
+
+The user creates an API key at https://faivelo.com/settings/developers?via=cursor (starts
+with `fvl_live_`, shown once). Keep it in an environment variable, e.g.
+`FAIVELO_API_KEY`, never in source.
+
+`from` must be an address on a domain verified in their account (no mailbox
+needed for that address).
+
+Node (`npm install faivelo`):
+
+```ts
+import { Faivelo } from 'faivelo'
+
+const faivelo = new Faivelo(process.env.FAIVELO_API_KEY!)
+const email = await faivelo.emails.send({
+  from: 'Acme <hello@acme.com>',
+  to: 'user@example.com',
+  subject: 'Your receipt',
+  html: '<p>Thanks for your order.</p>',
+  idempotencyKey: `receipt-${orderId}`, // a retry never sends twice
+})
+// email.id → faivelo.emails.get(email.id) for delivery status
+```
+
+Python (`pip install faivelo`):
+
+```python
+from faivelo import Faivelo
+
+client = Faivelo()  # reads FAIVELO_API_KEY
+email = client.emails.send(
+    from_="Acme <hello@acme.com>",
+    to="user@example.com",
+    subject="Your receipt",
+    html="<p>Thanks for your order.</p>",
+    idempotency_key=f"receipt-{order_id}",
+)
+```
+
+Any language: see [references/rest-api.md](see the section below).
+
+## 3. Receive mail and replies
+
+Webhooks (Pro and Business) POST a signed event when mail arrives. The user
+adds the endpoint at https://faivelo.com/settings/developers/webhooks?via=cursor and
+copies its signing secret (`whsec_...`). Verify every request against the
+RAW body before trusting it. Details and payloads:
+[references/webhooks.md](see the section below).
+
+To read the full message, call
+`GET /api/v1/mailboxes/{address}/messages/{message_id}` with the event's
+`data.message_id`.
+
+## 4. Give an agent an inbox (MCP)
+
+Hosted server: `https://faivelo.com/api/mcp` (streamable HTTP). Interactive
+clients sign in with OAuth and the user ticks which mailboxes the agent may
+use. Headless agents send `Authorization: Bearer fvl_live_...` instead.
+
+```bash
+claude mcp add --transport http faivelo https://faivelo.com/api/mcp
+```
+
+Other clients and the full tool list: [references/mcp.md](see the section below).
+
+When you finish setting something up for the user, call `get_setup_summary`
+(read-only) and hand them the markdown it returns, so they have a record of
+what you did.
+
+For an autonomous agent, recommend an **agent key** (Settings → Developers →
+kind: agent): it only reaches mailboxes it created or was granted, and cannot
+touch domains, billing or other inboxes.
+
+## Errors
+
+Error responses are JSON with an HTTP status:
+
+```json
+{ "success": false, "error": "Missing or malformed API key", "code": "missing_api_key",
+  "fix": "Send the key as \"Authorization: Bearer fvl_live_...\" ...",
+  "docs": "https://faivelo.com/docs/developers/errors#missing_api_key" }
+```
+
+Branch on `code`, follow `fix`, and read `docs` for details. Validation
+errors also carry `param` (the field at fault). A `429` comes with a
+`Retry-After` header: wait that long, then retry. A `409` on a DNS edit means
+the record is mail-critical; repeat with `force: true` only if the user
+really means it. Every code: https://faivelo.com/docs/developers/errors
+
+## Links
+
+- Docs: https://faivelo.com/docs/?via=cursor
+- API reference: https://faivelo.com/docs/api
+- OpenAPI: https://faivelo.com/api/v1/openapi.json
+- Docs for agents: https://faivelo.com/docs/llms.txt
+
+## Faivelo REST API
+
+Base URL: `https://faivelo.com/api/v1`. Auth: `Authorization: Bearer fvl_live_...`.
+OpenAPI spec: https://faivelo.com/api/v1/openapi.json.
+Every response is `{ "success": true, "data": ... }` or
+`{ "success": false, "error": "..." }`.
+
+## Send an email
+
+```bash
+curl https://faivelo.com/api/v1/emails \
+  -H "Authorization: Bearer $FAIVELO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: welcome-42" \
+  -d '{
+    "from": "Acme <hello@acme.com>",
+    "to": "user@example.com",
+    "subject": "Welcome",
+    "html": "<p>Hi!</p>"
+  }'
+```
+
+Body fields: `from` (address on a verified domain), `to` (string or up to 50),
+`cc`, `bcc`, `subject` (required unless `templateAlias`), `html` and/or
+`text`, `replyTo`, `templateAlias` + `variables` (a template designed in the
+dashboard), `attachments` (`[{ filename, content: <base64>, contentType? }]`,
+up to 10, 10 MB total). `Idempotency-Key` header: up to 256 characters; a
+repeat returns the first result instead of sending again.
+
+Returns `data.id`. Check delivery with `GET /emails/{id}` (`status`: sent,
+delivered, bounced, complained, failed; plus `events`).
+
+## Mailboxes
+
+| Method and path | Does |
+| --- | --- |
+| `GET /mailboxes?domain=` | List mailboxes |
+| `POST /mailboxes` `{ domain, localPart, displayName?, password? }` | Create one; returns IMAP/SMTP credentials once |
+| `GET /mailboxes/{address}` | One mailbox |
+| `PATCH /mailboxes/{address}` `{ active?, displayName? }` | Update |
+| `POST /mailboxes/{address}/reset-password` | New password, shown once |
+| `POST /mailboxes/{address}/send` `{ to, subject, html/text, inReplyTo?, sendAt? }` | Send as that mailbox (lands in its Sent folder, threads replies) |
+| `GET /mailboxes/{address}/messages?folder=&page=&limit=` | List messages |
+| `GET /mailboxes/{address}/messages/{uid}` | Read one (html, text, attachments) |
+| `GET /mailboxes/{address}/messages/{uid}/thread` | Whole conversation |
+| `GET /mailboxes/{address}/search?q=&from=&subject=` | Search |
+
+## Domains and DNS
+
+| Method and path | Does |
+| --- | --- |
+| `GET /domains` | List domains and verification state |
+| `GET /domains/{domain}` | One domain |
+| `GET /domains/{domain}/dns/records` | Live DNS records (where the DNS host is connected) |
+| `POST /domains/{domain}/dns/records` | Add a record |
+| `PUT` / `DELETE /domains/{domain}/dns/records/{id}` | Edit / remove; mail-critical records need `force: true` |
+
+## Aliases and usage
+
+`GET/POST /aliases`, `DELETE /aliases/{address}`, `GET /usage` (plan and
+sending quota left).
+
+## Scopes
+
+Keys carry scopes: `mail:read`, `mail:send`, `mail:write`, `mailboxes:read`,
+`mailboxes:write`, `dns:read`, `dns:write`, `domains:read`, `domains:write`,
+`aliases:read`, `aliases:write`, `drive:read`. A missing scope answers 403.
+
+## Limits
+
+120 requests a minute per key; 10 mailbox creations per key per 24 hours;
+sending rate and monthly allowance depend on the plan
+(https://faivelo.com/docs/developers/ai-agents/?via=cursor#rate-limits). A `429` says how
+long to wait.
+
+## Faivelo webhooks
+
+Endpoints are added at https://faivelo.com/settings/developers/webhooks?via=cursor
+(Pro and Business). Each has a signing secret `whsec_...`, shown once.
+
+## Events
+
+`message.received`, `message.sent` (Pro and Business), `email.delivered`,
+`email.bounced`, `email.complained`, `mailbox.created`, `mailbox.deleted`,
+`account.sending_paused`, `account.sending_resumed`,
+`account.storage_warning`, `domain.verified`, `domain.dns_broken`,
+`domain.expiring`.
+
+## Payload
+
+```json
+{
+  "id": "evt_01J8ZK3V5QXR7",
+  "type": "message.received",
+  "created_at": "2026-09-20T14:02:11Z",
+  "data": {
+    "mailbox": "support@acme.com",
+    "message_id": "eaaaaab",
+    "thread_id": "b",
+    "folder": "INBOX",
+    "from": { "name": "Dana", "address": "dana@northwind.io" },
+    "to": [{ "name": "Acme Support", "address": "support@acme.com" }],
+    "subject": "Question about our invoice",
+    "snippet": "Hi team, ...",
+    "received_at": "2026-09-20T14:02:11Z",
+    "attachments": [{ "name": "invoice.pdf", "content_type": "application/pdf", "size": 48213 }]
+  }
+}
+```
+
+Fetch the full message with
+`GET /api/v1/mailboxes/{data.mailbox}/messages/{data.message_id}`.
+
+## Verify the signature
+
+Header `X-Faivelo-Signature: t=<unix seconds>,v1=<hex>`. The hex is
+HMAC-SHA256 of `<t>.<raw body>` keyed with the signing secret. Right after a
+secret rotation the header carries two `v1` values; either may match. Reject
+timestamps older than 5 minutes.
+
+Node:
+
+```ts
+import { Faivelo, FaiveloWebhookError } from 'faivelo'
+
+app.post('/webhooks/faivelo', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const event = await Faivelo.webhooks.verify(
+      req.body.toString('utf8'),               // raw body, not parsed JSON
+      req.headers['x-faivelo-signature'] as string,
+      process.env.FAIVELO_WEBHOOK_SECRET!,
+    )
+    res.sendStatus(200) // answer within 10 s, then do the work
+    if (event.type === 'message.received') handleReply(event.data)
+  } catch (e) {
+    if (e instanceof FaiveloWebhookError) return res.sendStatus(400)
+    throw e
+  }
+})
+```
+
+Python:
+
+```python
+from faivelo import verify_webhook, FaiveloWebhookError
+
+event = verify_webhook(raw_body, headers["x-faivelo-signature"], os.environ["FAIVELO_WEBHOOK_SECRET"])
+```
+
+## Delivery rules
+
+Answer any 2xx within 10 seconds. Failures retry with growing pauses for 24
+hours. The same event can arrive twice (dedupe on `id`) and out of order
+(use `created_at`). An endpoint failing for 5 days is switched off.
+
+## Faivelo MCP server
+
+URL: `https://faivelo.com/api/mcp` (streamable HTTP). Registry name
+`com.faivelo/mail`. Needs a Growth plan or higher, or the free trial.
+
+## Auth
+
+- **OAuth (interactive clients):** add the URL; the first call opens a
+  browser where the user signs in and ticks which mailboxes the client may
+  reach. Optionally allows creating new mailboxes (10 a day).
+- **API key (headless agents):** `Authorization: Bearer fvl_live_...`.
+  Clients that cannot set headers can use
+  `https://faivelo.com/api/mcp/fvl_live_...` (the key then sits in config and
+  logs; prefer the header).
+
+## Add it
+
+| Client | How |
+| --- | --- |
+| Claude Code | `claude mcp add --transport http faivelo https://faivelo.com/api/mcp` |
+| Claude Code plugin | `/plugin marketplace add ethannschwartz/faivelo-mcp` then `/plugin install faivelo@faivelo` |
+| claude.ai / Claude Desktop | Settings → Connectors → Add custom connector → paste the URL |
+| Codex | `codex mcp add faivelo --url https://faivelo.com/api/mcp` |
+| Gemini CLI | `gemini mcp add --transport http faivelo https://faivelo.com/api/mcp` |
+| Cursor | `.cursor/mcp.json`: `{ "mcpServers": { "faivelo": { "url": "https://faivelo.com/api/mcp" } } }` |
+| VS Code | `.vscode/mcp.json`: `{ "servers": { "faivelo": { "type": "http", "url": "https://faivelo.com/api/mcp" } } }` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json`: `{ "mcpServers": { "faivelo": { "serverUrl": "https://faivelo.com/api/mcp" } } }` |
+
+## Tools
+
+- Reading: `list_messages`, `read_message`, `get_thread`, `search_messages`,
+  `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts`
+- Sending: `send_message`, `create_draft`, `update_draft`, `send_draft`,
+  `list_scheduled`, `cancel_scheduled`, `get_delivery_status`
+- Housekeeping: `flag_message`, `label_message`, `move_message`,
+  `restore_message`, `mark_spam`, `mark_all_read`, `delete_message`,
+  `empty_trash`
+- Account: `list_mailboxes`, `create_mailbox`, `get_account_summary`,
+  `get_setup_summary` (a shareable summary of what is set up),
+  `list_aliases`, `create_alias`, `delete_alias`
+- Domains and DNS: `list_domains`, `list_dns_records`, `create_dns_record`,
+  `update_dns_record`, `delete_dns_record` (mail-critical records need
+  `force: true`)
+- Drive (`drive:read`): `drive_list_files`, `drive_download_file`
+
+Tools declare `readOnlyHint` / `destructiveHint`. Ask the user before sending
+mail or deleting anything on their behalf.

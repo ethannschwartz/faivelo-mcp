@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "faivelo": {
+      "type": "http",
+      "url": "https://faivelo.com/api/mcp"
+    }
+  }
+}

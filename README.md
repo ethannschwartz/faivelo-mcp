@@ -28,7 +28,7 @@ free trial (no card). [Plans](https://faivelo.com/docs/billing/plans/?via=mcp)
 | Claude Code (plugin: MCP + skill) | `/plugin marketplace add ethannschwartz/faivelo-mcp` then `/plugin install faivelo@faivelo` |
 | Claude Code (MCP only) | `claude mcp add --transport http faivelo https://faivelo.com/api/mcp` |
 | claude.ai / Claude Desktop | Settings → Connectors → Add custom connector → paste `https://faivelo.com/api/mcp` |
-| Cursor | [Add to Cursor](https://cursor.com/install-mcp?name=faivelo&config=eyJ1cmwiOiJodHRwczovL2ZhaXZlbG8uY29tL2FwaS9tY3AifQ%3D%3D) |
+| Cursor (plugin: MCP + rule + skill) | `/add-plugin faivelo` in the agent chat, or [Add to Cursor](https://cursor.com/install-mcp?name=faivelo&config=eyJ1cmwiOiJodHRwczovL2ZhaXZlbG8uY29tL2FwaS9tY3AifQ%3D%3D) for the server alone (see [Cursor](#cursor)) |
 | VS Code | [Install in VS Code](https://insiders.vscode.dev/redirect/mcp/install?name=faivelo&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ffaivelo.com%2Fapi%2Fmcp%22%7D) |
 | Codex | `codex mcp add faivelo --url https://faivelo.com/api/mcp` |
 | Gemini CLI | `gemini extensions install https://github.com/ethannschwartz/faivelo-mcp` |
@@ -43,6 +43,28 @@ mailboxes the assistant can reach.
 `Authorization: Bearer fvl_live_...`. Create an *agent* key at
 [Settings → Developers](https://faivelo.com/settings/developers?via=mcp); it
 only reaches the mailboxes it creates or is granted.
+
+## Cursor
+
+Two ways in. Both sign you in through the browser on the first call; there
+is no key to paste.
+
+- **Plugin** (once it is listed on the Cursor Marketplace): type
+  `/add-plugin faivelo` in the agent chat, or find Faivelo under
+  Settings → Plugins. The plugin installs the MCP server, the
+  `faivelo-email` skill and a rule that teaches the agent to set up email on
+  a domain, send from an app and verify webhooks.
+- **Server only**: [Add to Cursor](https://cursor.com/install-mcp?name=faivelo&config=eyJ1cmwiOiJodHRwczovL2ZhaXZlbG8uY29tL2FwaS9tY3AifQ%3D%3D),
+  or put `{ "mcpServers": { "faivelo": { "url": "https://faivelo.com/api/mcp" } } }`
+  in `.cursor/mcp.json` (this project) or `~/.cursor/mcp.json` (every project).
+  Add `"headers": { "Authorization": "Bearer fvl_live_..." }` for a headless setup.
+
+Cursor sends at most about 40 tools to the model across every MCP server
+you have enabled. Faivelo exposes 30 to 33 tools on an OAuth connection
+(37 with an API key), so if you run other servers alongside it, switch off
+the tools you do not need in Cursor's MCP settings; the Drive tools
+(`drive_list_files`, `drive_download_file`) and the scheduling tools
+(`list_scheduled`, `cancel_scheduled`) are the usual first picks.
 
 ## Tools
 
@@ -66,8 +88,11 @@ before anything that sends or deletes.
 
 - `server.json`: the official MCP Registry entry
 - `.claude-plugin/` + `.mcp.json`: the Claude Code plugin and its marketplace
+- `.cursor-plugin/` + `mcp.json` + `rules/`: the Cursor plugin (the rule is generated from the skill)
 - `skills/faivelo-email/`: an [Agent Skill](https://agentskills.io) that teaches an agent to set up email on a domain, send from an app and verify inbound webhooks
 - `gemini-extension.json` + `GEMINI.md`: the Gemini CLI extension
+- `assets/logo.svg`: the Faivelo mark, for plugin listings
+- `CHANGELOG.md`: what changed in each plugin version
 
 ## Don't have email on your domain yet?
 
