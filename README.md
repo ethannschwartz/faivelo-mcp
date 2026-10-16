@@ -60,8 +60,8 @@ is no key to paste.
   Add `"headers": { "Authorization": "Bearer fvl_live_..." }` for a headless setup.
 
 Cursor sends at most about 40 tools to the model across every MCP server
-you have enabled. Faivelo exposes 30 to 33 tools on an OAuth connection
-(37 with an API key), so if you run other servers alongside it, switch off
+you have enabled. Faivelo exposes 30 to 34 tools on an OAuth connection
+(38 with an API key), so if you run other servers alongside it, switch off
 the tools you do not need in Cursor's MCP settings; the Drive tools
 (`drive_list_files`, `drive_download_file`) and the scheduling tools
 (`list_scheduled`, `cancel_scheduled`) are the usual first picks.
@@ -71,11 +71,17 @@ the tools you do not need in Cursor's MCP settings; the Drive tools
 | Area | Tools |
 | --- | --- |
 | Reading | `list_messages`, `read_message`, `get_thread`, `search_messages`, `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts` |
-| Sending | `send_message`, `create_draft`, `update_draft`, `send_draft`, `list_scheduled`, `cancel_scheduled`, `get_delivery_status` |
+| Sending | `send_message`, `send_batch` (one templated email to many recipients, queued and paced server-side), `get_batch_status`, `create_draft`, `update_draft`, `send_draft`, `list_scheduled`, `cancel_scheduled`, `get_delivery_status` |
 | Organising | `flag_message`, `label_message`, `move_message`, `restore_message`, `mark_spam`, `mark_all_read`, `delete_message`, `empty_trash` |
-| Account | `list_mailboxes`, `create_mailbox`, `get_account_summary`, `get_setup_summary`, `list_aliases`, `create_alias`, `delete_alias` |
+| Account | `list_mailboxes`, `create_mailbox`, `update_mailbox` (set the name a mailbox sends as), `get_account_summary`, `get_setup_summary`, `list_aliases`, `create_alias`, `delete_alias` |
 | Domains & DNS | `list_domains`, `list_dns_records`, `create_dns_record`, `update_dns_record`, `delete_dns_record` |
 | Drive | `drive_list_files`, `drive_download_file` |
+
+`send_message` and `send_batch` take `from` as `"bot@yourdomain.com"` or
+`"Support Bot <bot@yourdomain.com>"`; a name there (or `fromName`) is the
+From name for that message only. Give each mailbox a lasting name with
+`displayName` on `create_mailbox` or with `update_mailbox`; a send from a
+mailbox with no name anywhere returns a `hint` saying so.
 
 `get_setup_summary` returns a shareable markdown summary of what is set up
 (domains, DNS state, mailboxes, what is still pending), for an agent to hand

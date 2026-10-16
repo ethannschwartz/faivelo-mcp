@@ -3,6 +3,15 @@
 Notable changes to the Faivelo plugin for Cursor, Claude Code and Gemini CLI.
 The hosted MCP server itself ships with faivelo.com and is not versioned here.
 
+## 1.1.0
+
+- New tool `update_mailbox`: set or clear the name a mailbox sends as.
+- `send_message` and `send_batch` take `from` as `"Name <address>"` and an
+  optional `fromName` for a one-message name; drafts take `fromName`.
+- `list_mailboxes` returns each mailbox's `displayName`; a send with no name
+  anywhere returns a `hint`.
+- Skill: recommends `displayName` on `create_mailbox`.
+
 ## 1.0.0
 
 - Cursor plugin: `.cursor-plugin/plugin.json`, `mcp.json` (the hosted server

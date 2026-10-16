@@ -20,12 +20,16 @@ curl https://faivelo.com/api/v1/emails \
   }'
 ```
 
-Body fields: `from` (address on a verified domain), `to` (string or up to 50),
+Body fields: `from` (address on a verified domain, bare or `"Name <address>"`),
+`fromName` (optional; wins over a name in `from`), `to` (string or up to 50),
 `cc`, `bcc`, `subject` (required unless `templateAlias`), `html` and/or
 `text`, `replyTo`, `templateAlias` + `variables` (a template designed in the
 dashboard), `attachments` (`[{ filename, content: <base64>, contentType? }]`,
 up to 10, 10 MB total). `Idempotency-Key` header: up to 256 characters; a
 repeat returns the first result instead of sending again.
+
+With no name in the request, the From name is that address's mailbox name,
+else the domain default; with none at all the response carries a `hint`.
 
 Returns `data.id`. Check delivery with `GET /emails/{id}` (`status`: sent,
 delivered, bounced, complained, failed; plus `events`).
@@ -37,9 +41,9 @@ delivered, bounced, complained, failed; plus `events`).
 | `GET /mailboxes?domain=` | List mailboxes |
 | `POST /mailboxes` `{ domain, localPart, displayName?, password? }` | Create one; returns IMAP/SMTP credentials once |
 | `GET /mailboxes/{address}` | One mailbox |
-| `PATCH /mailboxes/{address}` `{ active?, displayName? }` | Update |
+| `PATCH /mailboxes/{address}` `{ active?, displayName? }` | Update; `displayName` is the From name recipients see |
 | `POST /mailboxes/{address}/reset-password` | New password, shown once |
-| `POST /mailboxes/{address}/send` `{ to, subject, html/text, inReplyTo?, sendAt? }` | Send as that mailbox (lands in its Sent folder, threads replies) |
+| `POST /mailboxes/{address}/send` `{ to, subject, html/text, fromName?, inReplyTo?, sendAt? }` | Send as that mailbox (lands in its Sent folder, threads replies); `fromName` is for this message only |
 | `GET /mailboxes/{address}/messages?folder=&page=&limit=` | List messages |
 | `GET /mailboxes/{address}/messages/{uid}` | Read one (html, text, attachments) |
 | `GET /mailboxes/{address}/messages/{uid}/thread` | Whole conversation |

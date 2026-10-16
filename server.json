@@ -3,7 +3,7 @@
   "name": "com.faivelo/mail",
   "title": "Faivelo Email",
   "description": "Business email on your own domain: mailboxes, send and read mail, aliases, DNS setup, and campaigns.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "websiteUrl": "https://faivelo.com/ai-agents",
   "repository": {
     "url": "https://github.com/ethannschwartz/faivelo-mcp",

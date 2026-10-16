@@ -4,7 +4,7 @@ description: Set up and use email on a custom domain with Faivelo. Use when the 
 license: MIT
 metadata:
   homepage: "https://faivelo.com/docs/developers/coding-agents/"
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Faivelo email
@@ -60,7 +60,8 @@ with `fvl_live_`, shown once). Keep it in an environment variable, e.g.
 `FAIVELO_API_KEY`, never in source.
 
 `from` must be an address on a domain verified in their account (no mailbox
-needed for that address).
+needed for that address). Write it as `"Name <address>"` (or pass `fromName`)
+so recipients see a name, not only the address.
 
 Node (`npm install faivelo`):
 
@@ -118,6 +119,11 @@ claude mcp add --transport http faivelo https://faivelo.com/api/mcp
 ```
 
 Other clients and the full tool list: [references/mcp.md](references/mcp.md).
+
+Give every mailbox a name: `displayName` on `create_mailbox`, or
+`update_mailbox` later. Without one, mail shows only the bare address (a
+send's response then carries a `hint`). `send_message` also takes
+`from: "Support Bot <bot@acme.com>"` for a one-message name.
 
 When you finish setting something up for the user, call `get_setup_summary`
 (read-only) and hand them the markdown it returns, so they have a record of

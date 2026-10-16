@@ -30,12 +30,15 @@ URL: `https://faivelo.com/api/mcp` (streamable HTTP). Registry name
 
 - Reading: `list_messages`, `read_message`, `get_thread`, `search_messages`,
   `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts`
-- Sending: `send_message`, `create_draft`, `update_draft`, `send_draft`,
+- Sending: `send_message`, `send_batch` (one templated email to many
+  recipients in one call; use it instead of looping `send_message`),
+  `get_batch_status`, `create_draft`, `update_draft`, `send_draft`,
   `list_scheduled`, `cancel_scheduled`, `get_delivery_status`
 - Housekeeping: `flag_message`, `label_message`, `move_message`,
   `restore_message`, `mark_spam`, `mark_all_read`, `delete_message`,
   `empty_trash`
-- Account: `list_mailboxes`, `create_mailbox`, `get_account_summary`,
+- Account: `list_mailboxes`, `create_mailbox`, `update_mailbox` (set or
+  clear the name a mailbox sends as), `get_account_summary`,
   `get_setup_summary` (a shareable summary of what is set up),
   `list_aliases`, `create_alias`, `delete_alias`
 - Domains and DNS: `list_domains`, `list_dns_records`, `create_dns_record`,
