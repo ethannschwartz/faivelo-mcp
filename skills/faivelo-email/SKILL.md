@@ -4,7 +4,7 @@ description: Set up and use email on a custom domain with Faivelo. Use when the 
 license: MIT
 metadata:
   homepage: "https://faivelo.com/docs/developers/coding-agents/"
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Faivelo email

@@ -3,6 +3,13 @@
 Notable changes to the Faivelo plugin for Cursor, Claude Code and Gemini CLI.
 The hosted MCP server itself ships with faivelo.com and is not versioned here.
 
+## 1.2.0
+
+- New tool `get_domain_setup`: one domain's DNS records grouped as MX, SPF,
+  DKIM, DMARC, sending and mail-app setup, each found or missing, with the
+  exact record to add. Read-only; it never changes DNS.
+- Read-only tools now state `destructiveHint: false` explicitly.
+
 ## 1.1.0
 
 - New tool `update_mailbox`: set or clear the name a mailbox sends as.

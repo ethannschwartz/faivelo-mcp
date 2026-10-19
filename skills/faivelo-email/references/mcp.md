@@ -40,6 +40,7 @@ URL: `https://faivelo.com/api/mcp` (streamable HTTP). Registry name
 - Account: `list_mailboxes`, `create_mailbox`, `update_mailbox` (set or
   clear the name a mailbox sends as), `get_account_summary`,
   `get_setup_summary` (a shareable summary of what is set up),
+  `get_domain_setup` (one domain's DNS records, found or missing, with what to add),
   `list_aliases`, `create_alias`, `delete_alias`
 - Domains and DNS: `list_domains`, `list_dns_records`, `create_dns_record`,
   `update_dns_record`, `delete_dns_record` (mail-critical records need
