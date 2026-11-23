@@ -4,7 +4,7 @@ description: Set up and use email on a custom domain with Faivelo. Use when the 
 license: MIT
 metadata:
   homepage: "https://faivelo.com/docs/developers/coding-agents/"
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Faivelo email
@@ -22,7 +22,7 @@ what the user asked for. You can combine them.
 
 Costs: forwarding-only is free; mailboxes, the send API and SMTP/IMAP need a
 paid plan (from $6/month, flat, unlimited mailboxes); MCP is included from
-Growth; webhooks from Pro. New accounts get a free trial without a card.
+Growth and on paid Agents plans; webhooks from Pro. New accounts get a free trial without a card.
 Plans: https://faivelo.com/docs/billing/plans/?via=claude-code. Tell the user before anything
 that needs a plan or a payment. Never pick a plan or enter payment details
 for them.

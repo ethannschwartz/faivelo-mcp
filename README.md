@@ -6,8 +6,8 @@
 Give Claude, ChatGPT, Cursor, Codex or any AI agent a real email inbox on
 your own domain. Your assistant can read and search your mail, draft and
 send replies, schedule sends, file messages away, create new addresses for
-itself, and fix your domain's DNS. You choose exactly which mailboxes it can
-see.
+itself (if you allow it), and check your domain's DNS or, with an API key,
+edit it. You choose exactly which mailboxes it can see.
 
 Useful when you want to:
 
@@ -18,8 +18,10 @@ Useful when you want to:
 
 **Server URL:** `https://faivelo.com/api/mcp` (streamable HTTP, OAuth 2.1, no API key to paste)
 **Registry name:** `com.faivelo/mail`
-**Access:** a Faivelo account. MCP is included on Growth and up, and in the
-free trial (no card). [Plans](https://faivelo.com/docs/billing/plans/?via=mcp)
+**Access:** a Faivelo account. MCP is included on the Growth, Pro and
+Business plans, on paid Agents plans (Developer, Scale) and in the free trial
+(no card). An API key bound to a free agent address works without a plan.
+[Plans](https://faivelo.com/docs/billing/plans/?via=mcp)
 
 ## Install
 
@@ -59,23 +61,34 @@ is no key to paste.
   in `.cursor/mcp.json` (this project) or `~/.cursor/mcp.json` (every project).
   Add `"headers": { "Authorization": "Bearer fvl_live_..." }` for a headless setup.
 
-Cursor sends at most about 40 tools to the model across every MCP server
-you have enabled. Faivelo exposes 30 to 34 tools on an OAuth connection
-(38 with an API key), so if you run other servers alongside it, switch off
-the tools you do not need in Cursor's MCP settings; the Drive tools
-(`drive_list_files`, `drive_download_file`) and the scheduling tools
-(`list_scheduled`, `cancel_scheduled`) are the usual first picks.
+Faivelo exposes 34 to 38 tools on a browser sign-in (34 by default; 2 more
+if you allow creating mailboxes, 2 more if the client asks for Drive access).
+An API key gets all 42 mail tools plus the hosted-service tools. If you run
+other MCP servers alongside
+it and the model gets too many tools, switch off the ones you do not need in
+Cursor's MCP settings; the scheduling tools (`list_scheduled`,
+`cancel_scheduled`) are a common first pick.
 
 ## Tools
 
 | Area | Tools |
 | --- | --- |
-| Reading | `list_messages`, `read_message`, `get_thread`, `search_messages`, `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts` |
+| Reading | `list_messages`, `read_message`, `get_thread` (agent inboxes only), `search_messages`, `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts` |
 | Sending | `send_message`, `forward_message` (forward a received message with its attachments), `send_batch` (one templated email to many recipients, queued and paced server-side), `get_batch_status`, `create_draft`, `update_draft`, `send_draft`, `list_scheduled`, `cancel_scheduled`, `get_delivery_status` |
-| Organising | `flag_message`, `label_message`, `move_message`, `restore_message`, `mark_spam`, `mark_all_read`, `delete_message`, `empty_trash` |
-| Account | `list_mailboxes`, `create_mailbox`, `update_mailbox` (set the name a mailbox sends as), `get_account_summary`, `get_setup_summary`, `get_domain_setup` (a domain's DNS records, found or missing), `list_aliases`, `create_alias`, `delete_alias` |
-| Domains & DNS | `list_domains`, `list_dns_records`, `create_dns_record`, `update_dns_record`, `delete_dns_record` |
-| Drive | `drive_list_files`, `drive_download_file` |
+| Organising | `flag_message`, `label_message` (agent inboxes only), `move_message`, `restore_message`, `mark_spam`, `mark_all_read`, `delete_message`, `empty_trash` |
+| Account | `list_mailboxes`, `create_mailbox` and `update_mailbox` (set the name a mailbox sends as; on a browser sign-in only if you allowed creating mailboxes), `get_account_summary`, `get_setup_summary`, `get_domain_setup` (a domain's DNS records, found or missing), `list_aliases`, `create_alias`, `delete_alias` |
+| Domains & DNS | `list_domains`; with an API key only: `list_dns_records`, `create_dns_record`, `update_dns_record`, `delete_dns_record` (mail-critical records need `force: true`) |
+| Drive | `drive_list_files`, `drive_download_file` (on a browser sign-in only when the client asks for the `drive:read` scope and you approve it) |
+| Hosted services (API key only) | `list_services`, `get_service`, `get_service_catalog`, `create_service` (billed monthly; the agent should ask first), `start_service`, `stop_service`, `restart_service`, `delete_service` |
+
+Threads and labels come with Faivelo Agents inboxes (a free address, or an
+inbox created as API-only): `get_thread`, `label_message` and the `label`
+filter on `list_messages`. On a person's mailbox, use `read_message` and the
+search tools (those calls answer `agent_inbox_only` there). Drafts work on
+every mailbox.
+
+`create_mailbox` is capped per key per 24 hours: 10, or 20 on the Developer
+plan and 100 on Scale.
 
 `send_message` and `send_batch` take `from` as `"bot@yourdomain.com"` or
 `"Support Bot <bot@yourdomain.com>"`; a name there (or `fromName`) is the

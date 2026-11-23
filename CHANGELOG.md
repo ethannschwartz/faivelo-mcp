@@ -3,6 +3,25 @@
 Notable changes to the Faivelo plugin for Cursor, Claude Code and Gemini CLI.
 The hosted MCP server itself ships with faivelo.com and is not versioned here.
 
+## 1.3.1
+
+Documentation corrections; no tool changed.
+
+- `get_thread`, `label_message` and the `label` filter on `list_messages`
+  work on agent inboxes only. A person's mailbox gets 403
+  `agent_inbox_only`. Drafts work on every mailbox.
+- The DNS record tools come with an API key only; a browser sign-in never
+  gets them. Plugin descriptions now say "check a domain's DNS records".
+- Drive tools appear on a browser sign-in only when the client asks for the
+  `drive:read` scope.
+- `create_mailbox`: 10 a day per key, 20 on the Developer plan, 100 on Scale.
+- Plan access: Growth, Pro and Business, paid Agents plans, the free trial,
+  and keys bound to a free agent address.
+- Tool counts corrected, and the hosted-service tools (API key only) are
+  listed in the README and the skill.
+- Skill: correct scope list and limits; the generated Cursor rule no longer
+  has a broken link to `references/mcp.md`.
+
 ## 1.3.0
 
 - New tool `forward_message`: forward a received message to new recipients

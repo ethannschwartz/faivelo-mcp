@@ -1,8 +1,8 @@
 {
   "name": "faivelo",
   "displayName": "Faivelo Email",
-  "version": "1.3.0",
-  "description": "Email on your own domain for Claude Code: the Faivelo MCP server (read, search, send and organise mail, mailboxes, aliases, DNS) and a skill for setting up a domain, sending from an app and receiving replies as webhooks.",
+  "version": "1.3.1",
+  "description": "Email on your own domain for Claude Code: the Faivelo MCP server (read, search, send and organise mail, mailboxes, aliases, DNS checks, and DNS edits with an API key) and a skill for setting up a domain, sending from an app and receiving replies as webhooks.",
   "author": {
     "name": "Faivelo",
     "email": "support@faivelo.com",

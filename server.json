@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.faivelo/mail",
   "title": "Faivelo Email",
-  "description": "Business email on your own domain: mailboxes, send and read mail, drafts, aliases and DNS setup.",
-  "version": "1.3.0",
+  "description": "Business email on your own domain: mailboxes, send and read mail, drafts, aliases and domain DNS checks.",
+  "version": "1.3.1",
   "websiteUrl": "https://faivelo.com/ai-agents",
   "repository": {
     "url": "https://github.com/ethannschwartz/faivelo-mcp",

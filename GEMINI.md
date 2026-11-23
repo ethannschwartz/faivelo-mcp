@@ -1,9 +1,10 @@
 # Faivelo
 
 The `faivelo` MCP server reads, searches, sends and organises mail in the
-user's Faivelo mailboxes and manages their mailboxes, aliases and DNS. The
-first call opens a browser sign-in where the user picks which mailboxes you
-may use.
+user's Faivelo mailboxes, manages aliases and checks a domain's DNS records.
+The first call opens a browser sign-in where the user picks which mailboxes
+you may use, and whether you may create new ones. To edit DNS records too,
+connect with a Faivelo API key.
 
 Ask the user before sending mail or deleting anything for them.
 
