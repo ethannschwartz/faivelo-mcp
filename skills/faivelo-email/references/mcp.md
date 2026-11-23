@@ -30,7 +30,8 @@ URL: `https://faivelo.com/api/mcp` (streamable HTTP). Registry name
 
 - Reading: `list_messages`, `read_message`, `get_thread`, `search_messages`,
   `search_all_mailboxes`, `list_folders`, `get_attachment`, `get_contacts`
-- Sending: `send_message`, `send_batch` (one templated email to many
+- Sending: `send_message`, `forward_message` (a received message, with its
+  attachments, to new recipients), `send_batch` (one templated email to many
   recipients in one call; use it instead of looping `send_message`),
   `get_batch_status`, `create_draft`, `update_draft`, `send_draft`,
   `list_scheduled`, `cancel_scheduled`, `get_delivery_status`

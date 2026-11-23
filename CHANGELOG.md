@@ -3,6 +3,13 @@
 Notable changes to the Faivelo plugin for Cursor, Claude Code and Gemini CLI.
 The hosted MCP server itself ships with faivelo.com and is not versioned here.
 
+## 1.3.0
+
+- New tool `forward_message`: forward a received message to new recipients
+  with an optional note, the original's headers and body, and its
+  attachments (up to 10 MB). The subject becomes `Fwd: …` and the original
+  keeps its read state. Same send limits as `send_message`.
+
 ## 1.2.0
 
 - New tool `get_domain_setup`: one domain's DNS records grouped as MX, SPF,
